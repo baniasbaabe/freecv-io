@@ -78,7 +78,3 @@ src/
   features/            one folder per screen: resume/ (editor, Polish, ATS, Job match), letter/, settings/
 src-tauri/             Rust shell; src/scrape.rs runs Scrapling for job links
 ```
-
-## Release builds
-
-`.github/workflows/build.yml` builds Windows (.msi/.exe), macOS (Intel and Apple Silicon .dmg) and Linux (.deb/.rpm/.AppImage) installers. It runs when you push a `v*` tag or start it manually, and attaches them to a draft GitHub release. The builds are unsigned, so macOS Gatekeeper and Windows SmartScreen will warn on first launch.
