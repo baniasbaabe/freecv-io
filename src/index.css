@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+/* Design tokens. Shapes: containers 16, controls and nested boxes 10, chips and pills 6. */
+@theme {
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --radius-chip: 6px;
+  --shadow-card: 0 1px 2px rgb(24 24 27 / 0.06);
+  --shadow-float: 0 12px 32px -12px rgb(24 24 27 / 0.28);
+  --shadow-paper: 0 1px 3px rgb(24 24 27 / 0.08), 0 20px 50px -20px rgb(24 24 27 / 0.25);
+}
+
+/* Component classes live in the components layer so Tailwind utilities on the element can still override them. */
+@layer components {
+  /* Type scale: every label and heading in the app uses one of these. */
+  .title {
+    @apply text-lg font-semibold tracking-tight text-zinc-900;
+  }
+  .heading {
+    @apply text-[15px] font-semibold tracking-tight text-zinc-900;
+  }
+  .subheading {
+    @apply text-sm font-semibold text-zinc-900;
+  }
+  .label {
+    @apply block text-xs font-medium text-zinc-500;
+  }
+  .hint {
+    @apply text-xs text-zinc-500;
+  }
+  .chip {
+    @apply inline-flex items-center rounded-chip px-1.5 py-0.5 text-[11px] font-medium whitespace-nowrap;
+  }
+
+  body {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .input {
+    @apply w-full rounded-control border border-transparent bg-zinc-100/80 px-3 py-2 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 focus:border-zinc-300 focus:bg-white focus:ring-4 focus:ring-zinc-900/5;
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+  .btn,
+  .btn-primary,
+  .btn-ghost,
+  .btn-icon {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-control px-3 py-1.5 text-sm font-medium select-none disabled:pointer-events-none disabled:opacity-50;
+    transition:
+      transform 160ms var(--ease-out-strong),
+      background-color 150ms ease;
+  }
+  .btn:active,
+  .btn-primary:active,
+  .btn-ghost:active,
+  .btn-icon:active {
+    transform: scale(0.97);
+  }
+  .btn {
+    @apply border border-zinc-200 bg-white text-zinc-800 shadow-card;
+  }
+  .btn-primary {
+    @apply bg-zinc-900 text-white shadow-sm;
+  }
+  .btn-ghost {
+    @apply text-zinc-600;
+  }
+  /* Square icon-only button; always pair with aria-label. */
+  .btn-icon {
+    @apply size-8 shrink-0 p-0 text-zinc-500;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover {
+      @apply bg-zinc-50;
+    }
+    .btn-primary:hover {
+      @apply bg-zinc-700;
+    }
+    .btn-ghost:hover,
+    .btn-icon:hover {
+      @apply bg-zinc-100 text-zinc-900;
+    }
+  }
+}
+
+/* react-colorful, sized and shaped to the app's tokens. */
+.accent-picker.react-colorful {
+  width: 100%;
+  height: 160px;
+}
+.accent-picker .react-colorful__saturation {
+  border-radius: var(--radius-control) var(--radius-control) 0 0;
+}
+.accent-picker .react-colorful__last-control {
+  border-radius: 0 0 var(--radius-control) var(--radius-control);
+}
+.accent-picker .react-colorful__pointer {
+  width: 18px;
+  height: 18px;
+}
+
+/* One A4 sheet; previews use `zoom` (not transform) so layout reflows and prints at true size. */
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  background: white;
+  color: #18181b;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+@page {
+  size: A4;
+  margin: 0;
+}
+/* The document is portaled into <body> as #print-area so multi-page output isn't clipped by the app's scroll layout. */
+#print-area {
+  display: none;
+}
+@media print {
+  #root {
+    display: none;
+  }
+  #print-area {
+    display: block;
+  }
+}
+
+/* Reduced motion: keep fades and color changes, drop movement (the spinner still turns: it signals status). */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-spin),
+  *::before,
+  *::after {
+    transition-property: opacity, background-color, color, border-color !important;
+    animation: none !important;
+  }
+}
+/* Translucent "glass" surfaces turn solid when transparency is reduced or contrast is raised. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background-color: white !important;
+    backdrop-filter: none !important;
+  }
+}
+@media (prefers-contrast: more) {
+  .glass {
+    background-color: white !important;
+    backdrop-filter: none !important;
+    border: 1px solid #52525b;
+  }
+}
