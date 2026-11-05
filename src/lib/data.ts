@@ -19,10 +19,21 @@ export type Resume = {
   languages: string;
   jobDescription: string;
   // Last AI results, kept with the resume so they survive tab switches and restarts.
+  // Body section order; optional (older saves lack it), see sectionOrder().
+  order?: SectionId[];
   ats?: Ats & { checkedAt: string };
   match?: Match & { checkedAt: string };
   polish?: Review[];
 };
+
+export const SECTIONS = { summary: "Summary", experience: "Experience", education: "Education", certifications: "Certifications", skills: "Skills", languages: "Languages" };
+export type SectionId = keyof typeof SECTIONS;
+// Saved order first, then any section it doesn't mention, so new sections never disappear.
+export function sectionOrder(r: Resume): SectionId[] {
+  const all = Object.keys(SECTIONS) as SectionId[];
+  const saved = (r.order ?? []).filter((id, i, a) => id in SECTIONS && a.indexOf(id) === i);
+  return [...saved, ...all.filter((id) => !saved.includes(id))];
+}
 
 export type Ats = {
   score: number;
@@ -148,15 +159,18 @@ export function resumeToText(r: Resume): string {
       .join("\n\n");
     return `${title}\n${body}`;
   };
+  const parts: Record<SectionId, string> = {
+    summary: p.summary && `SUMMARY\n${p.summary}`,
+    experience: section("EXPERIENCE", r.experience),
+    education: section("EDUCATION", r.education),
+    certifications: section("CERTIFICATIONS", r.certifications ?? []),
+    skills: skillList(r.skills).length ? `SKILLS\n${skillList(r.skills).join(", ")}` : "",
+    languages: skillList(r.languages ?? "").length ? `LANGUAGES\n${skillList(r.languages).join(", ")}` : "",
+  };
   return [
     [p.fullName, p.headline].filter(Boolean).join("\n"),
     [p.email, p.phone, p.location, ...p.links.filter((l) => l.url.trim()).map((l) => (l.label.trim() ? `${l.label.trim()}: ${prettyUrl(l.url)}` : prettyUrl(l.url)))].filter(Boolean).join(" | "),
-    p.summary && `SUMMARY\n${p.summary}`,
-    section("EXPERIENCE", r.experience),
-    section("EDUCATION", r.education),
-    section("CERTIFICATIONS", r.certifications ?? []),
-    skillList(r.skills).length ? `SKILLS\n${skillList(r.skills).join(", ")}` : "",
-    skillList(r.languages ?? "").length ? `LANGUAGES\n${skillList(r.languages).join(", ")}` : "",
+    ...sectionOrder(r).map((id) => parts[id]),
   ]
     .filter(Boolean)
     .join("\n\n");

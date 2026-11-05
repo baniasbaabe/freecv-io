@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { applySuggestion, bullets, inventsNumbers, linkHref, migrate, newResume, resumeToText, resumeFromParsed, sampleResume, skillList, skillsNotInResume, strength, type Resume as R } from "./data.ts";
+import { applySuggestion, bullets, sectionOrder, inventsNumbers, linkHref, migrate, newResume, resumeToText, resumeFromParsed, sampleResume, skillList, skillsNotInResume, strength, type Resume as R } from "./data.ts";
 import { parseLooseJson } from "./json.ts";
 
 test("bullets strips markers and blank lines", () => {
@@ -106,4 +106,10 @@ test("cropRect zooms and stays inside the image", async () => {
   assert.deepEqual(cropRect(400, 800, { cx: 0.5, cy: 0.5, zoom: 1 }), { side: 400, x: 0, y: 200 });
   assert.deepEqual(cropRect(400, 800, { cx: 0.5, cy: 0, zoom: 2 }), { side: 200, x: 100, y: 0 });
   assert.equal(cropRect(400, 800, { cx: 5, cy: 5, zoom: 2 }).x, 200);
+});
+
+test("sectionOrder honours saved order, drops junk and appends missing sections", () => {
+  const r = { ...sampleResume(), order: ["skills", "bogus", "skills", "summary"] as never };
+  assert.deepEqual(sectionOrder(r), ["skills", "summary", "experience", "education", "certifications", "languages"]);
+  assert.match(resumeToText(r), /SKILLS\n[^]*SUMMARY\n[^]*EXPERIENCE/);
 });

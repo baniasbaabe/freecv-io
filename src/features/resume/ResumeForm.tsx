@@ -1,6 +1,7 @@
 import { Field } from "../../components/ui/Field";
 import { Section } from "../../components/ui/Section";
-import type { Resume } from "../../lib/data";
+import { IconArrowDown, IconArrowUp } from "../../components/ui/icons";
+import { SECTIONS, sectionOrder, type Resume } from "../../lib/data";
 import { EntryList } from "./EntryList";
 import { LinksEditor } from "./LinksEditor";
 import { PhotoPicker } from "./PhotoPicker";
@@ -8,6 +9,12 @@ import { PhotoPicker } from "./PhotoPicker";
 export function ResumeForm({ r, set }: { r: Resume; set: (r: Resume) => void }) {
   const p = r.personal;
   const setP = (k: "fullName" | "headline" | "email" | "phone" | "location" | "summary") => (v: string) => set({ ...r, personal: { ...p, [k]: v } });
+  const order = sectionOrder(r);
+  const swap = (i: number, d: number) => {
+    const next = [...order];
+    [next[i], next[i + d]] = [next[i + d], next[i]];
+    set({ ...r, order: next });
+  };
   return (
     <>
       <Section title="Personal details">
@@ -21,6 +28,17 @@ export function ResumeForm({ r, set }: { r: Resume; set: (r: Resume) => void }) 
         </div>
       </Section>
       <LinksEditor links={p.links} onChange={(links) => set({ ...r, personal: { ...p, links } })} />
+      <Section title="Section order">
+        <ul className="divide-y divide-zinc-100 rounded-card border border-zinc-200">
+          {order.map((id, i) => (
+            <li key={id} className="flex items-center gap-1 px-3 py-1 text-sm">
+              <span className="flex-1">{SECTIONS[id]}</span>
+              <button className="btn-icon" disabled={i === 0} onClick={() => swap(i, -1)} aria-label={`Move ${SECTIONS[id]} up`}><IconArrowUp /></button>
+              <button className="btn-icon" disabled={i === order.length - 1} onClick={() => swap(i, 1)} aria-label={`Move ${SECTIONS[id]} down`}><IconArrowDown /></button>
+            </li>
+          ))}
+        </ul>
+      </Section>
       <Section title="Professional summary">
         <Field label="2-4 sentences on who you are and your biggest wins" area rows={4} value={p.summary} onChange={setP("summary")} />
       </Section>

@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { bullets, dates, skillList, type Entry, type Resume } from "../lib/data";
+import { Fragment, type ReactNode } from "react";
+import { bullets, dates, sectionOrder, skillList, type Entry, type Resume, type SectionId } from "../lib/data";
 import { contacts, Joined, Photo } from "./shared";
 
 // Every template is single-column with standard headings and near-zero letter-spacing, so PDF text
@@ -48,16 +48,15 @@ type H = (p: { children: ReactNode }) => ReactNode;
 function Body({ r, H, accent }: { r: Resume; H: H; accent?: string }) {
   const skills = skillList(r.skills);
   const languages = skillList(r.languages ?? "");
-  return (
-    <>
-      {r.personal.summary && (<><H>Summary</H><p>{r.personal.summary}</p></>)}
-      {filled(r.experience).length > 0 && (<><H>Experience</H><Entries items={r.experience} accent={accent} /></>)}
-      {filled(r.education).length > 0 && (<><H>Education</H><Entries items={r.education} accent={accent} /></>)}
-      {filled(r.certifications ?? []).length > 0 && (<><H>Certifications</H><Entries items={r.certifications ?? []} accent={accent} /></>)}
-      {skills.length > 0 && (<><H>Skills</H><p>{skills.join(" · ")}</p></>)}
-      {languages.length > 0 && (<><H>Languages</H><p>{languages.join(" · ")}</p></>)}
-    </>
-  );
+  const parts: Record<SectionId, ReactNode> = {
+    summary: r.personal.summary && (<><H>Summary</H><p>{r.personal.summary}</p></>),
+    experience: filled(r.experience).length > 0 && (<><H>Experience</H><Entries items={r.experience} accent={accent} /></>),
+    education: filled(r.education).length > 0 && (<><H>Education</H><Entries items={r.education} accent={accent} /></>),
+    certifications: filled(r.certifications ?? []).length > 0 && (<><H>Certifications</H><Entries items={r.certifications ?? []} accent={accent} /></>),
+    skills: skills.length > 0 && (<><H>Skills</H><p>{skills.join(" · ")}</p></>),
+    languages: languages.length > 0 && (<><H>Languages</H><p>{languages.join(" · ")}</p></>),
+  };
+  return <>{sectionOrder(r).map((id) => <Fragment key={id}>{parts[id]}</Fragment>)}</>;
 }
 
 function Classic({ r }: { r: Resume }) {
