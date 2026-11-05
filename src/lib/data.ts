@@ -1,4 +1,5 @@
 import type { TemplateId } from "../templates/resume";
+import type { Crop } from "./photo";
 
 // Experience and education share one shape: title = role/degree, org = company/school.
 export type Entry = { title: string; org: string; location: string; start: string; end: string; details: string };
@@ -9,7 +10,7 @@ export type Resume = {
   template: TemplateId;
   accent: string;
   // photo: square JPEG data URL; optional because resumes saved before photos existed lack it.
-  personal: { fullName: string; headline: string; email: string; phone: string; location: string; links: Link[]; summary: string; photo?: string };
+  personal: { fullName: string; headline: string; email: string; phone: string; location: string; links: Link[]; summary: string; photo?: string; photoSrc?: string; photoCrop?: Crop };
   experience: Entry[];
   education: Entry[];
   // optional: resumes saved before certifications existed lack it.

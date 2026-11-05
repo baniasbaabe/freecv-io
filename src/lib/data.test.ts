@@ -100,3 +100,10 @@ test("inventsNumbers flags metrics the resume never mentions", () => {
   assert.equal(inventsNumbers(r, { target: "summary", before: "", after: "Cut costs by 87%", reason: "" }), true);
   assert.equal(inventsNumbers(r, { target: "summary", before: "", after: "Led engineers", reason: "" }), false);
 });
+
+test("cropRect zooms and stays inside the image", async () => {
+  const { cropRect } = await import("./photo.ts");
+  assert.deepEqual(cropRect(400, 800, { cx: 0.5, cy: 0.5, zoom: 1 }), { side: 400, x: 0, y: 200 });
+  assert.deepEqual(cropRect(400, 800, { cx: 0.5, cy: 0, zoom: 2 }), { side: 200, x: 100, y: 0 });
+  assert.equal(cropRect(400, 800, { cx: 5, cy: 5, zoom: 2 }).x, 200);
+});
