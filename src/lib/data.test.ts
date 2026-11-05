@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { applySuggestion, bullets, linkHref, migrate, newResume, resumeToText, resumeFromParsed, sampleResume, skillList, skillsNotInResume, strength, type Resume as R } from "./data.ts";
+import { applySuggestion, bullets, inventsNumbers, linkHref, migrate, newResume, resumeToText, resumeFromParsed, sampleResume, skillList, skillsNotInResume, strength, type Resume as R } from "./data.ts";
 import { parseLooseJson } from "./json.ts";
 
 test("bullets strips markers and blank lines", () => {
@@ -93,4 +93,10 @@ test("resumeFromParsed maps a CV parse and survives junk", () => {
   assert.equal(r.skills, "SQL, Python");
   assert.equal(r.languages, "English, Yoruba");
   assert.equal(resumeFromParsed(null, "cv.pdf").name, "cv.pdf");
+});
+
+test("inventsNumbers flags metrics the resume never mentions", () => {
+  const r = sampleResume();
+  assert.equal(inventsNumbers(r, { target: "summary", before: "", after: "Cut costs by 87%", reason: "" }), true);
+  assert.equal(inventsNumbers(r, { target: "summary", before: "", after: "Led engineers", reason: "" }), false);
 });

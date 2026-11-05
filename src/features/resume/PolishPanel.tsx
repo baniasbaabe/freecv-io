@@ -5,7 +5,7 @@ import { Intro } from "../../components/ui/Section";
 import { AiButton, ErrorBox } from "../../components/ui/feedback";
 import { IconCheck, IconX } from "../../components/ui/icons";
 import { useAi } from "../../hooks/useAi";
-import { applySuggestion, resumeForPrompt, skillsNotInResume, uid, type Resume, type Review, type Settings, type Suggestion } from "../../lib/data";
+import { applySuggestion, inventsNumbers, resumeForPrompt, skillsNotInResume, uid, type Resume, type Review, type Settings, type Suggestion } from "../../lib/data";
 import { chatJson } from "../../lib/groq";
 import { notify } from "../../lib/notify";
 
@@ -23,14 +23,15 @@ export function PolishPanel({ r, set, patch, onCreate, settings }: { r: Resume; 
       setNote("");
       const { suggestions } = await chatJson<{ suggestions?: Suggestion[] }>(
         settings,
-        `You are an expert resume writer. Propose concrete line-level rewrites that make this resume stronger: lead with impact, keep the numbers the resume already has prominent, use strong action verbs, cut filler and passive voice, keep each bullet to one or two lines.
-${tailor ? "Tailor it to the job description: mirror its wording and must-have keywords wherever the candidate's experience genuinely supports them, put the most relevant skills first, and aim the headline and summary at this role.\n" : ""}Never invent employers, titles, numbers, tools or achievements that are not in the resume. Skip lines that are already strong.
+        `You are an expert resume writer. Propose concrete line-level rewrites that make this resume stronger.
+Bullet formula: "Accomplished [X], measured by [Y], by doing [Z]". Start with a strong action verb (past tense; present tense for the current role), put the outcome first, keep each bullet to one or two lines, cut filler ("responsible for", "helped with") and passive voice, keep the candidate's voice.
+${tailor ? "Tailor it to the job description: when a bullet already describes a skill the job wants, use the job's exact wording for it (e.g. the bullet says \"built dashboards in Looker\" and the job says \"data visualization\"). Put the most relevant skills first and aim the headline and summary at this role. Never change official job titles; a matching target title may appear in the headline or summary only. Do not add a job keyword the resume gives no evidence for.\n" : ""}Hard rules: never invent employers, titles, dates, tools, scope or achievements. Every number in "after" must already appear in the resume. When a bullet has no metric, do not make one up: reuse scope already stated (team size, users, frequency, systems) or leave the line alone. Skip lines that are already strong.
 Reply with JSON only: {"suggestions": [{"target": "headline"|"summary"|"skills"|"bullet", "entry": number, "before": string, "after": string, "reason": string}]}.
 "entry" is N from [EN] for bullets. "before" is the current text of that line copied exactly. "after" is the full replacement (for skills: the full comma-separated list). "reason" is at most 8 words, like "Adds scope and ownership". At most 12 suggestions.`,
         resumeForPrompt(r) + (tailor ? `\n\nJOB DESCRIPTION:\n${r.jobDescription}` : ""),
       );
-      // Model output is untrusted: drop malformed or no-op suggestions.
-      const list = (suggestions ?? []).filter((s) => s && typeof s.after === "string" && s.after.trim() && s.after.trim() !== String(s.before ?? "").trim());
+      // Model output is untrusted: drop malformed, no-op and number-inventing suggestions.
+      const list = (suggestions ?? []).filter((s) => s && typeof s.after === "string" && s.after.trim() && s.after.trim() !== String(s.before ?? "").trim() && !inventsNumbers(r, s));
       setItems(list.map((s) => ({ ...s, state: "pending" as const })));
       return list.length;
     });

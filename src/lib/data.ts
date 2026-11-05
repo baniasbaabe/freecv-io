@@ -172,6 +172,12 @@ export function resumeForPrompt(r: Resume): string {
   ].join("\n\n");
 }
 
+// True when a suggestion contains a number the resume never mentions: the model made up a metric.
+export function inventsNumbers(r: Resume, s: Suggestion): boolean {
+  const known = new Set(resumeToText(r).match(/\d+(?:[.,]\d+)*/g));
+  return (s.after?.match(/\d+(?:[.,]\d+)*/g) ?? []).some((n) => !known.has(n));
+}
+
 // Returns the resume with one suggestion applied, or null when its target text no longer exists.
 export function applySuggestion(r: Resume, s: Suggestion): Resume | null {
   const after = s.after?.trim();
