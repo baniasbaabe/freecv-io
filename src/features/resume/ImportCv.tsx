@@ -8,8 +8,9 @@ const PROMPT = `Extract the resume below into JSON. Reply with JSON only:
 {"fullName": string, "headline": string, "email": string, "phone": string, "location": string, "links": [{"label": string, "url": string}], "summary": string,
 "experience": [{"title": string, "org": string, "location": string, "start": string, "end": string, "bullets": string[]}],
 "education": [{"title": string, "org": string, "location": string, "start": string, "end": string, "bullets": string[]}],
+"certifications": [{"title": string, "org": string, "location": string, "start": string, "end": string, "bullets": string[]}],
 "skills": string[], "languages": string[]}.
-"headline" is the person's current or target job title. For education, "title" is the degree and "org" the school.
+"headline" is the person's current or target job title. For education, "title" is the degree and "org" the school. For certifications, "title" is the certificate and "org" the issuer.
 Copy text exactly as written: do not rewrite, summarize, translate or invent anything. Use "" or [] for anything missing.
 Keep dates as written (e.g. "03/2021", "2019", "Present"). Each bullet is one achievement or responsibility line.
 Languages include the level if given, e.g. "German (C1)".`;

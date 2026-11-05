@@ -12,6 +12,8 @@ export type Resume = {
   personal: { fullName: string; headline: string; email: string; phone: string; location: string; links: Link[]; summary: string; photo?: string };
   experience: Entry[];
   education: Entry[];
+  // optional: resumes saved before certifications existed lack it.
+  certifications?: Entry[];
   skills: string;
   languages: string;
   jobDescription: string;
@@ -151,6 +153,7 @@ export function resumeToText(r: Resume): string {
     p.summary && `SUMMARY\n${p.summary}`,
     section("EXPERIENCE", r.experience),
     section("EDUCATION", r.education),
+    section("CERTIFICATIONS", r.certifications ?? []),
     skillList(r.skills).length ? `SKILLS\n${skillList(r.skills).join(", ")}` : "",
     skillList(r.languages ?? "").length ? `LANGUAGES\n${skillList(r.languages).join(", ")}` : "",
   ]
@@ -277,6 +280,7 @@ export function resumeFromParsed(p: unknown, fallbackName: string): Resume {
     },
     experience: entries(o.experience).length ? entries(o.experience) : [emptyEntry()],
     education: entries(o.education).length ? entries(o.education) : [emptyEntry()],
+    certifications: entries(o.certifications),
     skills: list(o.skills),
     languages: list(o.languages),
   };

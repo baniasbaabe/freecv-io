@@ -53,6 +53,7 @@ function Body({ r, H, accent }: { r: Resume; H: H; accent?: string }) {
       {r.personal.summary && (<><H>Summary</H><p>{r.personal.summary}</p></>)}
       {filled(r.experience).length > 0 && (<><H>Experience</H><Entries items={r.experience} accent={accent} /></>)}
       {filled(r.education).length > 0 && (<><H>Education</H><Entries items={r.education} accent={accent} /></>)}
+      {filled(r.certifications ?? []).length > 0 && (<><H>Certifications</H><Entries items={r.certifications ?? []} accent={accent} /></>)}
       {skills.length > 0 && (<><H>Skills</H><p>{skills.join(" · ")}</p></>)}
       {languages.length > 0 && (<><H>Languages</H><p>{languages.join(" · ")}</p></>)}
     </>

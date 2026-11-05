@@ -26,6 +26,7 @@ export function ResumeForm({ r, set }: { r: Resume; set: (r: Resume) => void }) 
       </Section>
       <EntryList title="Experience" titleLabel="Job title" orgLabel="Employer" items={r.experience} onChange={(experience) => set({ ...r, experience })} />
       <EntryList title="Education" titleLabel="Degree" orgLabel="School" items={r.education} onChange={(education) => set({ ...r, education })} />
+      <EntryList title="Certifications" titleLabel="Certification" orgLabel="Issuer" items={r.certifications ?? []} onChange={(certifications) => set({ ...r, certifications })} />
       <Section title="Skills">
         <Field label="Comma or line separated" area rows={3} value={r.skills} onChange={(skills) => set({ ...r, skills })} />
       </Section>
