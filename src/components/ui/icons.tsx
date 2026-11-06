@@ -5,6 +5,7 @@ export {
   CaretDown as IconCaretDown,
   CaretUpDown as IconCaretUpDown,
   Check as IconCheck,
+  DotsSixVertical as IconDrag,
   DownloadSimple as IconDownload,
   EnvelopeSimple as IconMail,
   FileArrowUp as IconImport,
